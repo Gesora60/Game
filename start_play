@@ -1,0 +1,108 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <string.h>
+
+// Define constants for ranks and suits
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+#define NUM_CARDS 52
+#define NUM_PLAYERS 4
+
+// Define arrays for ranks and suits
+char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+char *suits[] = {"Hearts", "Diamonds", "Clubs", "Spades"};
+
+// Function to generate a random card
+char *generateRandomCard() {
+    int rank = rand() % NUM_RANKS;
+    int suit = rand() % NUM_SUITS;
+    return ranks[rank];
+}
+
+// Function to generate a random starting card
+char *generateStartingCard() {
+    return generateRandomCard();
+}
+
+// Function to assign cards to each player and print their hands
+void assignAndPrintCards(char *playerHands[NUM_PLAYERS][4]) 
+{
+    //create deck of cards
+    char *deck[NUM_RANKS * NUM_SUITS];
+    for (int rank = 0; rank < NUM_RANKS; rank++) 
+    {
+        for (int suit = 0; suit < NUM_SUITS; suit++)
+        {
+            int cardIndex = suit * NUM_RANKS + rank;
+            deck[cardIndex] = generateRandomCard(); 
+            }
+        }
+
+// shuffle an array of cards
+for (int i = 0; i < NUM_RANKS * NUM_SUITS; i++) {
+        int j = rand() % (NUM_RANKS * NUM_SUITS);
+        char *temp = deck[i];
+        deck[i] = deck[j];
+        deck[j] = temp;
+    }
+    
+// Assign cards to each player
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        printf("Player %d's hand:\n", player + 1);
+        for (int i = 0; i < 4; i++) {
+            int cardIndex = player * 4 + i;
+            playerHands[player][i] = deck[cardIndex];
+            printf("%s of %s\n", playerHands[player][i], suits[rand() % NUM_SUITS]);
+        }
+    }
+}
+
+// Function to allow a player to make a move
+void playerMove(char *playerHand[], char *startingCard) {
+    // Check if the starting card can be matched
+    char *deck[NUM_RANKS * NUM_SUITS];
+    for (int i = 0; i < 4; i++) {
+        if (playerHand[i] != NULL && (strcmp(playerHand[i], startingCard) == 0 || strcmp(suits[rand() % NUM_SUITS], suits[rand() % NUM_SUITS]) == 0)) {
+            printf("Player makes a move: %s\n", playerHand[i]);
+            playerHand[i] = NULL; // Remove the played card from the player's hand
+            return;
+        }
+    }
+
+    // If no matching card, select a card from the deck
+    for (int i = 0; i < NUM_RANKS * NUM_SUITS; i++) {
+        if (deck[i] != NULL) {
+            printf("Player picks a new card from the deck: %s\n", deck[i]);
+            playerHand[0] = deck[i]; // Add the new card to the player's hand
+            deck[i] = NULL; // Remove the selected card from the deck
+            return;
+        }
+    }
+
+    printf("Player has no moves left.\n");
+}
+
+int main() {
+   // Seed the random number generator
+    srand(time(NULL));
+
+    // Initialize player hands and deck
+    char *playerHands[NUM_PLAYERS][4];
+    char *deck[NUM_RANKS * NUM_SUITS];
+
+    // Assign cards to players and print their hands
+    assignAndPrintCards(playerHands);
+
+    // Example starting card and starting player (you can change as needed)
+    char *startingCard = generateStartingCard();
+    int startingPlayer = rand() % NUM_PLAYERS;
+    printf("Starting player: Player %d\n", startingPlayer + 1);
+    printf("Starting card: %s of %s\n", startingCard, suits[rand() % NUM_SUITS]);
+
+    // Starting player's move
+    printf("Player %d's turn:\n", startingPlayer + 1);
+    playerMove(playerHands[startingPlayer], startingCard, deck);
+
+    return 0;
+}
