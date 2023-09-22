@@ -6,63 +6,78 @@
 #define NUM_RANKS 13
 #define NUM_SUITS 4
 #define NUM_CARDS 52
+#define NUM_PLAYERS 4
 
 // Define arrays for ranks and suits
 char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 char *suits[] = {"Hearts", "Diamonds", "Clubs", "Spades"};
 
-// Print cards in sets of four
+// Function to generate a random card
+char *generateRandomCard() {
+    int rank = rand() % NUM_RANKS;
+    int suit = rand() % NUM_SUITS;
+    return ranks[rank];
+}
 
-void print_card()
+// Function to generate a random starting card
+char *generateStartingCard() {
+    return generateRandomCard();
+}
+
+// Function to randomly select a starting player and allow them to add a matching card
+void selectStartingPlayerAndAddCard() {
+    int startingPlayer = rand() % NUM_PLAYERS;
+    char *matchingCard = generateStartingCard();
+
+    printf("Starting player: Player %d\n", startingPlayer + 1);
+    printf("Starting card: %s of %s\n", matchingCard, suits[rand() % NUM_SUITS]);
+
+    // Simulate the player adding a matching card (same rank or same suit)
+    printf("Player %d adds a matching card: %s of %s\n", startingPlayer + 1, matchingCard, suits[rand() % NUM_SUITS]);
+}
+
+// Function to assign cards to each player and print their hands
+void assignAndPrintCards() 
 {
-    for (int rank = 0; rank < NUM_RANKS; rank++) {
-        printf("Cards in Set %d:\n", rank+ 1);
-
-        for (int suit = 0; suit < NUM_SUITS; suit++) {
-            // Create a deck of cards
-            char *deck[NUM_RANKS * NUM_SUITS];
-            // Populate the deck by combining ranks and suits
+    char *deck[NUM_RANKS * NUM_SUITS];
+    for (int rank = 0; rank < NUM_RANKS; rank++) 
+    {
+        for (int suit = 0; suit < NUM_SUITS; suit++)
+        {
             int cardIndex = suit * NUM_RANKS + rank;
-            // Allocate memory for card string
-            deck[cardIndex] = malloc(20); 
-            // Print the deck of cards
-            printf("%s of %s\t", suits[suit], ranks[rank]);
-
-            // Print a newline after every four cards
-            if ((suit + 1) % 4 == 0) {
-                printf("\n");
-                free(deck[suit]); // Free the allocated memory
+            deck[cardIndex] = generateRandomCard(); 
             }
         }
+
+// shuffle an array of cards
+for (int i = 0; i < NUM_RANKS * NUM_SUITS; i++) {
+        int j = rand() % (NUM_RANKS * NUM_SUITS);
+        char *temp = deck[i];
+        deck[i] = deck[j];
+        deck[j] = temp;
+    }
+    
+// Assign cards to each player
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        printf("Player %d's hand:\n", player + 1);
+        for (int i = 0; i < 4; i++) {
+            int cardIndex = player * 4 + i;
+            printf("%s of %s\n", deck[cardIndex], suits[rand() % NUM_SUITS]);
+        }
         printf("\n");
-        
     }
-
+    // Generate and print the starting card
+selectStartingPlayerAndAddCard();
 }
 
-// Function to shuffle an array of integers
-void shuffle(int array[], int size) {
-    for (int i = size - 1; i > 0; i--) {
-        int j = rand() % (i + 1);
-        int temp = array[i];
-        array[i] = array[j];
-        array[j] = temp;
-// Print the deck of cards
-     printf("%d\n", array[i]);
-    }
-}
 
 
 int main() {
-    // Initialize random seed
+    // Seed the random number generator
     srand(time(NULL));
-    int deck[NUM_CARDS];
-    for (int i = 0; i < NUM_CARDS; i++) {
-        deck[i] = i + 1;
-    }
-     // Shuffle the deck
-     
-    shuffle(deck, NUM_CARDS);
-    
-    return (0);
+
+    // Call the function to assign cards to players and print their hands
+    assignAndPrintCards();
+
+    return 0;
 }
