@@ -8,8 +8,10 @@
 // Define arrays for ranks and suits
 char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
 char *suits[] = {"Hearts", "Diamonds", "Clubs", "Spades"};
-int main() {
-    // Print cards in sets of four
+
+void print_card()
+{
+   // Print cards in sets of four
     for (int rank = 0; rank < NUM_RANKS; rank++) {
         printf("Cards in Set %d:\n", rank+ 1);
 
@@ -25,5 +27,10 @@ int main() {
         printf("\n");
     }
 
-    return 0;
+}
+
+int main() {
+    print_card();
+    
+    return (0);
 }
