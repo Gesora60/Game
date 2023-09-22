@@ -1,0 +1,29 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define constants for ranks and suits
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+
+// Define arrays for ranks and suits
+char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+char *suits[] = {"Hearts", "Diamonds", "Clubs", "Spades"};
+int main() {
+    // Print cards in sets of four
+    for (int rank = 0; rank < NUM_RANKS; rank++) {
+        printf("Cards in Set %d:\n", rank+ 1);
+
+        for (int suit = 0; suit < NUM_SUITS; suit++) {
+            int cardIndex = suit * NUM_RANKS + rank;
+            printf("%s of %s\t", suits[suit], ranks[rank]);
+
+            // Print a newline after every four cards
+            if ((suit + 1) % 4 == 0) {
+                printf("\n");
+            }
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
