@@ -124,20 +124,21 @@ int main() {
     printf("Starting card: %s of %s\n", startingCard.rank, startingCard.suit);
 
     int winner = -1; // Initialize the winner to -1 (no winner)
-// Game loop
+    // Game loop
     while (1) {
         // Starting player's move
         printf("Player %d's turn:\n", currentPlayer + 1);
         playerMove(playerHands[startingPlayer], &startingCard, deck, &deckIndex);
 
-  // Check if the current player has won
-     if (playerHands[currentPlayer][3].rank != NULL &&
-        strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
-        strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
-        winner = currentPlayer;
-        break; // Exit the game loop, a player has won
+        // Check if the current player has won
+        if (playerHands[currentPlayer][3].rank != NULL &&
+            strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
+            strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
+            winner = currentPlayer;
+            break; // Exit the game loop, a player has won
         }
-// Check for game end conditions (e.g., when a player has no moves left)
+        
+        // Check for game end conditions (e.g., when a player has no moves left)
         int gameEnd = 1;
         for (int player = 0; player < NUM_PLAYERS; player++) {
             for (int i = 0; i < 4; i++) {
