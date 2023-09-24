@@ -119,17 +119,18 @@ int main() {
     // Example starting card and starting player (you can change as needed)
     struct Card startingCard = generateStartingCard();
     int startingPlayer = rand() % NUM_PLAYERS;
+    int currentPlayer = startingPlayer;
     printf("Starting player: Player %d\n", startingPlayer + 1);
     printf("Starting card: %s of %s\n", startingCard.rank, startingCard.suit);
 
     int winner = -1; // Initialize the winner to -1 (no winner)
 // Game loop
     while (1) {
-    // Starting player's move
-    printf("Player %d's turn:\n", startingPlayer + 1);
-    playerMove(playerHands[startingPlayer], &startingCard, deck, &deckIndex);
+        // Starting player's move
+        printf("Player %d's turn:\n", currentPlayer + 1);
+        playerMove(playerHands[startingPlayer], &startingCard, deck, &deckIndex);
 
-    // Check if the current player has won
+  // Check if the current player has won
      if (playerHands[currentPlayer][3].rank != NULL &&
         strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
         strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
