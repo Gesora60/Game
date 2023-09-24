@@ -1,0 +1,119 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
+#include <string.h>
+
+// Define constants for ranks and suits
+#define NUM_RANKS 13
+#define NUM_SUITS 4
+#define NUM_CARDS 52
+#define NUM_PLAYERS 4
+
+// Define arrays for ranks and suits
+char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
+char *suits[] = {"Hearts", "Diamonds", "Clubs", "Spades"};
+
+// Structure to hold a card
+struct Card {
+    char *rank;
+    char *suit;
+    int inHand;
+};
+
+// Function to generate a random card
+struct Card generateRandomCard() {
+    struct Card card;
+    int rankIndex = rand() % NUM_RANKS;
+    int suitIndex = rand() % NUM_SUITS;
+    card.rank = ranks[rankIndex];
+    card.suit = suits[suitIndex];
+    return card;
+}
+
+// Function to generate a random starting card
+struct Card generateStartingCard() {
+    return generateRandomCard();
+}
+
+// Function to assign cards to each player and return their hands as an array of cards
+void assignCards(struct Card playerHands[][4]) {
+    // Create an array to represent the deck of cards
+    struct Card deck[NUM_RANKS * NUM_SUITS];
+
+    // Initialize the deck by combining ranks and suits
+    for (int rank = 0; rank < NUM_RANKS; rank++) {
+        for (int suit = 0; suit < NUM_SUITS; suit++) {
+            int cardIndex = rank * NUM_SUITS + suit;
+            deck[cardIndex] = generateRandomCard();
+        }
+    }
+
+    // Shuffle the deck by swapping cards randomly
+    for (int i = 0; i < NUM_RANKS * NUM_SUITS; i++) {
+        int j = rand() % (NUM_RANKS * NUM_SUITS);
+        struct Card temp = deck[i];
+        deck[i] = deck[j];
+        deck[j] = temp;
+    }
+    // Assign cards to each player
+    for (int player = 0; player < NUM_PLAYERS; player++) {
+        printf("Player %d's hand:\n", player + 1);
+        for (int i = 0; i < 4; i++) {
+            int cardIndex = player * 4 + i;
+            printf("%s of %s\n", deck[cardIndex], suits[rand() % NUM_SUITS]);
+        }
+        printf("\n");
+    }
+}
+
+
+// Function to allow a player to make a move
+void playerMove(struct Card playerHand[], struct Card *startingCard, struct Card deck[], int *deckIndex) {
+    // Check if the starting card can be matched
+    for (int i = 0; i < 4; i++) {
+        if (playerHand[i].rank != NULL && (strcmp(playerHand[i].rank, startingCard->rank) == 0 || strcmp(playerHand[i].suit, startingCard->suit) == 0)) {
+            printf("Player plays a matching card: %s of %s\n", playerHand[i].rank, playerHand[i].suit);
+            *startingCard = playerHand[i]; // Update the starting card
+            playerHand[i].rank = ; // Remove the played card from the player's hand
+            return;
+        }
+    }
+
+    // If no matching card, select a card from the deck
+    if (*deckIndex < NUM_RANKS * NUM_SUITS) {
+        printf("Player draws a new card from the deck: %s of %s\n", deck[*deckIndex].rank, deck[*deckIndex].suit);
+        playerHand[0] = deck[*deckIndex]; // Add the new card to the player's hand
+        deck[*deckIndex].rank = ; // Remove the selected card from the deck
+        (*deckIndex)++;
+    } else {
+        printf("No cards left in the deck. Player has no moves left.\n");
+    }
+}
+
+int main() {
+   // Seed the random number generator
+    srand(time(NULL));
+
+    // Create a 2D array to hold player hands
+    struct Card playerHands[NUM_PLAYERS][4];
+    // Create an array to represent the deck of cards
+    struct Card deck[NUM_RANKS * NUM_SUITS];
+    // Call the function to assign cards to players and populate playerHands
+    // Declare and initialize the deckIndex variable
+    int deckIndex = 0;
+
+    assignCards(playerHands);
+
+    // Example starting card and starting player (you can change as needed)
+    struct Card startingCard = generateStartingCard();
+    int startingPlayer = rand() % NUM_PLAYERS;
+    printf("Starting player: Player %d\n", startingPlayer + 1);
+    printf("Starting card: %s of %s\n", startingCard.rank, startingCard.suit);
+
+    // Starting player's move
+    printf("Player %d's turn:\n", startingPlayer + 1);
+    playerMove(playerHands[startingPlayer], &startingCard, deck, &deckIndex);
+
+    return 0;
+}
