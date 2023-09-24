@@ -8,7 +8,7 @@
 #define NUM_RANKS 13
 #define NUM_SUITS 4
 #define NUM_CARDS 52
-#define NUM_PLAYERS 2
+#define NUM_PLAYERS 3
 
 // Define arrays for ranks and suits
 char *ranks[] = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"};
@@ -90,6 +90,7 @@ void playerMove(struct Card playerHands[], struct Card *startingCard, struct Car
         if (playerHands[i].rank != NULL && (strcmp(playerHands[i].rank, startingCard->rank) == 0 || strcmp(playerHands[i].suit, startingCard->suit) == 0)) {
             printf("Player plays a matching card: %s of %s\n", playerHands[i].rank, playerHands[i].suit);
             *startingCard = playerHands[i]; // Update the starting card
+            printf("Current card: %s of %s\n", startingCard->rank, startingCard->suit);
             playerHands[i].rank = NULL; // Remove the played card from the player's hand
             return;
         }
@@ -99,7 +100,7 @@ void playerMove(struct Card playerHands[], struct Card *startingCard, struct Car
     if (*deckIndex < NUM_RANKS * NUM_SUITS) {
         printf("Player draws a new card from the deck: %s of %s\n", deck[*deckIndex].rank, deck[*deckIndex].suit);
         playerHands[0] = deck[*deckIndex]; // Add the new card to the player's hand
-        deck[*deckIndex].rank = NULL; // Remove the selected card from the deck
+        deck[*deckIndex].rank = ""; // Remove the selected card from the deck
         (*deckIndex)++;
         } 
     }
@@ -135,9 +136,9 @@ int main() {
 
        // Check if the current player has won
          
-        if (playerHands[currentPlayer][3].rank != NULL &&
-        strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
-        strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
+        if (playerHands[currentPlayer][0].rank != NULL &&
+        strcmp(playerHands[currentPlayer][0].rank, "4") >= 0 &&
+        strcmp(playerHands[currentPlayer][0].rank, "9") <= 0) {
         winner = currentPlayer;
         break; // Exit the game loop, a player has won
         }
