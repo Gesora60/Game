@@ -37,8 +37,6 @@ struct Card generateStartingCard() {
 
 // Function to assign cards to each player and return their hands as an array of cards
 void assignCards(struct Card playerHands[][4], struct Card deck[]) {
-  // Declare and initialize an array of flags to track assigned cards
-    int assigned[NUM_RANKS * NUM_SUITS] = {0};
 
     // Initialize the deck by combining ranks and suits
     for (int rank = 0; rank < NUM_RANKS; rank++) {
@@ -56,8 +54,13 @@ void assignCards(struct Card playerHands[][4], struct Card deck[]) {
         deck[j] = temp;
     }
     
+   // Declare and initialize an array of flags to track assigned cards
+    int assigned[NUM_RANKS * NUM_SUITS] = {0};
+    
+    // Create an array to keep track of the number of cards in each player's hand
+    int playerHandsCount[NUM_PLAYERS] = {0};
+    
     // Assign cards to each player
-   // Assign cards to each player
     for (int player = 0; player < NUM_PLAYERS; player++) {
         printf("Player %d's hand:\n", player + 1);
         for (int i = 0; i < 4; i++) {
@@ -68,11 +71,12 @@ void assignCards(struct Card playerHands[][4], struct Card deck[]) {
 
             assigned[randomIndex] = 1; // Mark the card as assigned
             playerHands[player][i] = deck[randomIndex];
+            playerHandsCount[player]++; 
             printf("%s of %s\n", playerHands[player][i].rank, playerHands[player][i].suit);
             // Remove the assigned card from the deck
             deck[randomIndex] = deck[NUM_RANKS * NUM_SUITS - 1];
-            deck[NUM_RANKS * NUM_SUITS - 1].rank = NULL;
-            deck[NUM_RANKS * NUM_SUITS - 1].suit = NULL;
+            deck[NUM_RANKS * NUM_SUITS - 1].rank = "";
+            deck[NUM_RANKS * NUM_SUITS - 1].suit = "";
         }
         printf("\n");
     }
@@ -80,13 +84,13 @@ void assignCards(struct Card playerHands[][4], struct Card deck[]) {
 
 
 // Function to allow a player to make a move
-void playerMove(struct Card playerHand[], struct Card *startingCard,struct Card deck[], int *deckIndex) {
+void playerMove(struct Card playerHands[], struct Card *startingCard, struct Card deck[], int *deckIndex) {
     // Check if the starting card can be matched
     for (int i = 0; i < 4; i++) {
-        if (playerHand[i].rank != NULL && (strcmp(playerHand[i].rank, startingCard->rank) == 0 || strcmp(playerHand[i].suit, startingCard->suit) == 0)) {
-            printf("Player plays a matching card: %s of %s\n", playerHand[i].rank, playerHand[i].suit);
-            *startingCard = playerHand[i]; // Update the starting card
-            playerHand[i].rank = NULL; // Remove the played card from the player's hand
+        if (playerHands[i].rank != NULL && (strcmp(playerHands[i].rank, startingCard->rank) == 0 || strcmp(playerHands[i].suit, startingCard->suit) == 0)) {
+            printf("Player plays a matching card: %s of %s\n", playerHands[i].rank, playerHands[i].suit);
+            *startingCard = playerHands[i]; // Update the starting card
+            playerHands[i].rank = NULL; // Remove the played card from the player's hand
             return;
         }
     }
@@ -94,13 +98,12 @@ void playerMove(struct Card playerHand[], struct Card *startingCard,struct Card 
     // If no matching card, select a card from the deck
     if (*deckIndex < NUM_RANKS * NUM_SUITS) {
         printf("Player draws a new card from the deck: %s of %s\n", deck[*deckIndex].rank, deck[*deckIndex].suit);
-        playerHand[0] = deck[*deckIndex]; // Add the new card to the player's hand
+        playerHands[0] = deck[*deckIndex]; // Add the new card to the player's hand
         deck[*deckIndex].rank = NULL; // Remove the selected card from the deck
         (*deckIndex)++;
-    } else {
-        printf("No cards left in the deck. Player has no moves left.\n");
+        } 
     }
-}
+
 
 int main() {
    // Seed the random number generator
@@ -122,7 +125,7 @@ int main() {
     int currentPlayer = startingPlayer;
     printf("Starting player: Player %d\n", startingPlayer + 1);
     printf("Starting card: %s of %s\n", startingCard.rank, startingCard.suit);
-
+    
     int winner = -1; // Initialize the winner to -1 (no winner)
     // Game loop
     while (1) {
@@ -130,30 +133,35 @@ int main() {
         printf("Player %d's turn:\n", currentPlayer + 1);
         playerMove(playerHands[startingPlayer], &startingCard, deck, &deckIndex);
 
-        // Check if the current player has won
+       // Check if the current player has won
+         
         if (playerHands[currentPlayer][3].rank != NULL &&
-            strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
-            strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
-            winner = currentPlayer;
-            break; // Exit the game loop, a player has won
+        strcmp(playerHands[currentPlayer][3].rank, "4") >= 0 &&
+        strcmp(playerHands[currentPlayer][3].rank, "9") <= 0) {
+        winner = currentPlayer;
+        break; // Exit the game loop, a player has won
+        }
+        // Game end condition flags
+        int noCardsLeftInDeck = 0;
+        int playerWithNoCards = -1; 
+        // Check for game end conditions
+        if (playerHands[0] == 0) {
+            playerWithNoCards = 0;
+        }
+        // If the deck is empty:
+        if (deckIndex >= NUM_CARDS) {
+            noCardsLeftInDeck = 1;
+        }
+        if (noCardsLeftInDeck || playerWithNoCards != -1) {
+            if (noCardsLeftInDeck) {
+                printf("No cards left in the deck. Game over!\n");
+            }
+            if (playerWithNoCards != -1) {
+                printf("Player %d has run out of cards. Game over!\n", playerWithNoCards + 1);
+            }
+            break; // Exit the game loop when a game end condition is met
         }
         
-        // Check for game end conditions (e.g., when a player has no moves left)
-        int gameEnd = 1;
-        for (int player = 0; player < NUM_PLAYERS; player++) {
-            for (int i = 0; i < 4; i++) {
-                if (playerHands[player][i].rank != NULL) {
-                    gameEnd = 0;
-                    break;
-                }
-            }
-        }
-
-        if (gameEnd) {
-            printf("Game over! All players have no moves left.\n");
-            break;
-        }
-
         // Move to the next player
         currentPlayer = (currentPlayer + 1) % NUM_PLAYERS;
     }
